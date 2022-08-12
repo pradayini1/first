@@ -189,4 +189,30 @@ elif [ $hour -ge 21 -o $hour -lt 5 ]
 then
         echo -e "Good night `whoami`, Have nice day!\nThis is $day $dte in $mon of $year ($tf)"
 fi
+---------------------------------------------------------------------
+19
+
+for i in {1..10}  
+do  
+touch $i.txt;  
+done;  
+
+
+for i in *.txt  
+do  
+echo $i;  
+done;  
+
+for i in *.txt  
+do  
+newfile=${i/.txt/.zip};  
+echo $newfile;  
+done;  
+
+for i in *.txt  
+do  
+newfile=${i/.txt/.zip};  
+mv $i $newfile;  
+done:  
+ls -lta
 
