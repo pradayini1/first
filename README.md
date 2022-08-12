@@ -31,62 +31,101 @@ do
 done
 -------------------------------------
 
-nouser=`who | wc -l`
-echo -e "User name: $USER (Login name: $LOGNAME)" >> /tmp/info.tmp.01.$$$
-echo -e "Current Shell: $SHELL"  >> /tmp/info.tmp.01.$$$
-echo -e "Home Directory: $HOME" >> /tmp/info.tmp.01.$$$
-echo -e "Your O/s Type: $OSTYPE" >> /tmp/info.tmp.01.$$$
-echo -e "PATH: $PATH" >> /tmp/info.tmp.01.$$$
-echo -e "Current directory: `pwd`" >> /tmp/info.tmp.01.$$$
-echo -e "Currently Logged: $nouser user(s)" >> /tmp/info.tmp.01.$$$
-if [ -f /etc/redhat-release ]
-then
-    echo -e "OS: `cat /etc/redhat-release`" >> /tmp/info.tmp.01.$$$
-fi
+15
 
-if [ -f /etc/shells ]
-then
-    echo -e "Available Shells: " >> /tmp/info.tmp.01.$$$
-    echo -e "`cat /etc/shells`"  >> /tmp/info.tmp.01.$$$
-fi
-echo -e "--------------------------------------------------------------------" >> /tmp/info.tmp.01.$$$ 
-echo -e "Computer CPU Information:" >> /tmp/info.tmp.01.$$$ 
-echo -e "--------------------------------------------------------------------" >> /tmp/info.tmp.01.$$$ 
-cat /proc/cpuinfo >> /tmp/info.tmp.01.$$$
+#!/bin/bash
+<<COMMENT
+Print Informations:
+1. Currently logged user
+2. Your shell directory
+3. Home directory
+4. OS name and version
+5. Current working directory
+6. Number of users logged in
+7. Show all available shells in your system
+8. Hard disk information
+9. CPU information
+10. Memory information
+11. file system information
+12. Currently running process
+COMMENT
 
-echo -e "--------------------------------------------------------------------" >> /tmp/info.tmp.01.$$$ 
-echo -e "Computer Memory Information:" >> /tmp/info.tmp.01.$$$
-if [ -f /etc/sysconfig/mouse ]
-then
-    echo -e "--------------------------------------------------------------------" >> /tmp/info.tmp.01.$$$ 
-    echo -e "Computer Mouse Information: " >> /tmp/info.tmp.01.$$$
-    echo -e "--------------------------------------------------------------------" >> /tmp/info.tmp.01.$$$ 
-    echo -e "`cat 
-echo -e "--------------------------------------------------------------------" >> /tmp/info.tmp.01.$$$ 
-echo -e "Computer CPU Information:" >> /tmp/info.tmp.01.$$$ 
-echo -e "--------------------------------------------------------------------" >> /tmp/info.tmp.01.$$$ 
-cat /proc/cpuinfo >> /tmp/info.tmp.01.$$$
+echo "Enter the option from 1-13 to get the particular information:
+1. Currently logged user
+2. Your shell directory
+3. Home directory
+4. OS name and version
+5. Current working directory
+6. Number of users logged in
+7. Show all available shells in your system
+8. Hard disk information
+9. CPU information
+10. Memory information
+11. file system information
+12. Currently running process"
 
-echo -e "--------------------------------------------------------------------" >> /tmp/info.tmp.01.$$$ 
-echo -e "Computer Memory Information:" >> /tmp/info.tmp.01.$$$ 
-echo -e "--------------------------------------------------------------------" >> /tmp/info.tmp.01.$$$ 
-cat /proc/meminfo >> /tmp/info.tmp.01.$$$
-if [ -d /proc/ide/hda ]
-then
-    echo -e "--------------------------------------------------------------------" >> /tmp/info.tmp.01.$$$ 
-    echo -e "Hard disk information:" >> /tmp/info.tmp.01.$$$ 
-    echo -e "--------------------------------------------------------------------" >> /tmp/info.tmp.01.$$$ 
-    echo -e "Model: `cat /proc/ide/hda/model` " >> /tmp/info.tmp.01.$$$    
-    echo -e "Driver: `cat /proc/ide/hda/driver` " >> /tmp/info.tmp.01.$$$    
-    echo -e "Cache size: `cat 
-echo -e "--------------------------------------------------------------------" >> /tmp/info.tmp.01.$$$ 
-echo -e "File System (Mount):" >> /tmp/info.tmp.01.$$$ 
-echo -e "--------------------------------------------------------------------" >> /tmp/info.tmp.01.$$$ 
-cat /proc/mounts >> /tmp/info.tmp.01.$$$
+echo -n "Choice: " ; read option
 
-if which dialog > /dev/null
-then
-    dialog  --backtitle "Linux Software Diagnostics (LSD) Shell Script Ver.1.0" --title "Press Up/Down Keys to move" --textbox  /tmp/info.tmp.01.$$$ 21 70
-else
-    cat /tmp/info.tmp.01.$$$ |more
-fi
+case $option in
+	1) # prints the names of the users currently logged in to the current host without showing any information about source, login time, or any other relevant information 
+	   echo "Currently logged user:"; users;
+	   ;;
+	2) #gives shell name relative to root
+	   echo "Your shell directory: $SHELL"
+	   ;;
+	3) echo "Home directory: $HOME"
+	   ;;
+	4) echo -n "operating system name is:  "; uname -s ; #uname
+  	   echo -n "operating system version is:  "; uname -v
+	   echo -n "operating system release is:  "; uname -r
+        #echo -n network hostname: ; uname -n
+	   #echo -n hardware name: ; uname -m
+     	   ;; 
+	5) echo "Current working directory: $PWD"
+   	   ;;
+	6) echo -n "Number of users logged in is: "
+   	   who -u | wc -l
+	   #who -q
+	   ;;
+	7) cat /etc/shells | grep -v "#"
+	   ;;
+	8) echo "Hard disk information:"
+        diskutil list #in MAC
+        #for further detailed information of each physical disk
+        diskutil info disk0
+        diskutil info disk1
+
+        #sudo lshw -short
+	    #sudo hdparm -I /dev/sda
+	   ;; 
+	9) echo "CPU information:"
+        #in MAC
+        echo "Chip Brand – Processor Type and Chip Model – CPU Speed"
+        sysctl -n machdep.cpu.brand_string
+
+        #CPU details
+        sysctl -a | grep machdep.cpu
+        #CPU Processor Details of a Mac with system_profiler
+        #system_profiler
+
+        #sudo lscpu
+	   #cat /proc/cpuinfo
+	   ;;
+	10)echo "Memory information:"
+        #in MAC
+        sysctl -a | grep mem
+
+        #cat /proc/meminfo
+	   ;;
+	11)echo "file system information:"
+	   df -H
+	   #fdisk -1 ; mount
+	   ;;
+	12)echo "Currently running process:"
+	   ps
+ 	   #gives currently running process dynamically
+	   #top 
+	   ;; 
+	*)echo "Invalid option:"
+	   ;;
+esac
